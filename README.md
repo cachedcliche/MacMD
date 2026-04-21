@@ -12,7 +12,14 @@ Minimum macOS version: 14 (Sonoma). Tested on 15 (Sequoia) and 26 (Tahoe).
 
 ### 1. Download
 
-Grab `MacMD-1.0.0.dmg` from the [latest release](../../releases/latest). It's ~160 KB.
+Go to the [latest release](../../releases/latest). You'll see several files — grab just one:
+
+| File | What it is | Who should click it |
+|---|---|---|
+| **`MacMD-1.0.0.dmg`** | The installer. ~160 KB. | **Most people — this is the one you want.** |
+| `MacMD-1.0.0.zip` | Same app, zipped instead of in a DMG. | Alternative if your browser doesn't like DMGs. |
+| `*.sha256` | Tiny checksum files. | Optional; for verifying your download wasn't tampered with. |
+| `Source code (zip / tar.gz)` | The Swift source. | Only if you want to build it yourself. Ignore otherwise. |
 
 ### 2. Copy to Applications
 
