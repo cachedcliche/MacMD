@@ -91,7 +91,14 @@ There are 20 unit tests covering every syntax highlighting rule and the tricky e
 
     Scripts/package.sh 1.0.0
 
-This runs a clean Release build, zips `MacMD.app` via `ditto` (signature-preserving), writes `dist/MacMD-1.0.0.zip`, and a matching `.sha256` file. Upload both to the GitHub release page.
+This runs a clean Release build and produces four artifacts in `dist/`:
+
+    MacMD-1.0.0.zip           signature-preserving zip (built with ditto)
+    MacMD-1.0.0.zip.sha256
+    MacMD-1.0.0.dmg           drag-to-Applications installer
+    MacMD-1.0.0.dmg.sha256
+
+Upload all four to the GitHub release page. Most users prefer the DMG; the zip is a smaller alternative.
 
 ## Project layout
 
@@ -116,7 +123,7 @@ This runs a clean Release build, zips `MacMD.app` via `ditto` (signature-preserv
       Scripts/
         README.md
         make_icon.swift           Regenerates the app icon PNGs
-        package.sh                Builds Release and zips into dist/
+        package.sh                Builds Release and produces zip + dmg in dist/
       docs/
         screenshot.png
       dist/                       (gitignored) release artifacts go here
