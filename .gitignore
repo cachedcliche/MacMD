@@ -35,3 +35,6 @@ MacMD.app
 *.swp
 *.swo
 *~
+
+# Local-only project reference doc
+project.md
