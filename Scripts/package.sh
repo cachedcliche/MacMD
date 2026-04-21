@@ -42,6 +42,7 @@ shasum -a 256 "$DIST/$ZIP_NAME" | awk '{print $1}' > "$DIST/$ZIP_NAME.sha256"
 
 echo "Packaging -> $DIST/$DMG_NAME"
 STAGE=$(mktemp -d /tmp/macmd-dmg.XXXXXX)
+trap 'rm -rf "$STAGE"' EXIT
 cp -R "$BUILT_APP" "$STAGE/"
 ln -s /Applications "$STAGE/Applications"
 hdiutil create \
@@ -49,10 +50,9 @@ hdiutil create \
     -srcfolder "$STAGE" \
     -ov \
     -format UDZO \
-    -fs HFS+ \
+    -fs APFS \
     -quiet \
     "$DIST/$DMG_NAME"
-rm -rf "$STAGE"
 shasum -a 256 "$DIST/$DMG_NAME" | awk '{print $1}' > "$DIST/$DMG_NAME.sha256"
 
 echo

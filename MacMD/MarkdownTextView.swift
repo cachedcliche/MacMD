@@ -97,9 +97,11 @@ struct MarkdownTextView: NSViewRepresentable {
             guard !hasLoaded, let tv = textView, let ts = tv.textStorage else { return }
             hasLoaded = true
             isUpdatingFromBinding = true
+            highlighter.isSuppressed = true
             ts.beginEditing()
             ts.replaceCharacters(in: NSRange(location: 0, length: ts.length), with: text)
             ts.endEditing()
+            highlighter.isSuppressed = false
             highlighter.rehighlightAll(ts)
             isUpdatingFromBinding = false
         }
@@ -108,9 +110,11 @@ struct MarkdownTextView: NSViewRepresentable {
             guard let ts = textView.textStorage else { return }
             let oldSelection = textView.selectedRange()
             isUpdatingFromBinding = true
+            highlighter.isSuppressed = true
             ts.beginEditing()
             ts.replaceCharacters(in: NSRange(location: 0, length: ts.length), with: newText)
             ts.endEditing()
+            highlighter.isSuppressed = false
             highlighter.rehighlightAll(ts)
             let newLength = (ts.string as NSString).length
             let clampedLocation = min(oldSelection.location, newLength)

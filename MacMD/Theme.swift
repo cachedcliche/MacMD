@@ -19,7 +19,13 @@ enum Theme {
     static var accentColor: NSColor { .controlAccentColor }
     static var linkColor: NSColor { .linkColor }
     static var codeBackgroundColor: NSColor {
-        NSColor.secondaryLabelColor.withAlphaComponent(0.10)
+        NSColor(name: nil) { appearance in
+            var resolved: NSColor = .clear
+            appearance.performAsCurrentDrawingAppearance {
+                resolved = NSColor.secondaryLabelColor.withAlphaComponent(0.10)
+            }
+            return resolved
+        }
     }
 
     static let bodyParagraphStyle: NSParagraphStyle = {

@@ -2,13 +2,16 @@ import AppKit
 
 final class MarkdownHighlighter: NSObject, NSTextStorageDelegate {
 
+    var isSuppressed = false
+    private var lastFenceLineStarts: [Int] = []
+
     private struct Rule {
         let regex: NSRegularExpression
         let apply: (NSTextStorage, NSTextCheckingResult) -> Void
     }
 
     private static func r(_ pattern: String, options: NSRegularExpression.Options = []) -> NSRegularExpression {
-        (try? NSRegularExpression(pattern: pattern, options: options))!
+        try! NSRegularExpression(pattern: pattern, options: options)
     }
 
     private static let fencePattern: NSRegularExpression = r("^[ \\t]*```[^\\n]*$", options: [.anchorsMatchLines])
@@ -85,15 +88,25 @@ final class MarkdownHighlighter: NSObject, NSTextStorageDelegate {
                      didProcessEditing editedMask: NSTextStorageEditActions,
                      range editedRange: NSRange,
                      changeInLength delta: Int) {
-        guard editedMask.contains(.editedCharacters) else { return }
+        guard editedMask.contains(.editedCharacters), !isSuppressed else { return }
 
         let nsString = textStorage.string as NSString
         let total = NSRange(location: 0, length: nsString.length)
         guard editedRange.location <= nsString.length else { return }
 
-        let paragraph = nsString.paragraphRange(for: editedRange)
+        let fenceLines = fenceLineRanges(in: nsString, fullRange: total)
+        let currentFenceStarts = fenceLines.map { $0.location }
+        let fencesChanged = currentFenceStarts != lastFenceLineStarts
+        lastFenceLineStarts = currentFenceStarts
 
-        let codeSpans = fencedCodeSpans(in: nsString, fullRange: total)
+        let codeSpans = spansFromFences(fenceLines, fullRange: total)
+
+        if fencesChanged {
+            applyHighlighting(to: textStorage, in: total, fencedSpans: codeSpans)
+            return
+        }
+
+        let paragraph = nsString.paragraphRange(for: editedRange)
         let targetRange: NSRange
         if let containing = codeSpans.first(where: { NSLocationInRange(paragraph.location, $0) || NSIntersectionRange($0, paragraph).length > 0 }) {
             targetRange = containing
@@ -105,8 +118,11 @@ final class MarkdownHighlighter: NSObject, NSTextStorageDelegate {
     }
 
     func rehighlightAll(_ textStorage: NSTextStorage) {
-        let full = NSRange(location: 0, length: (textStorage.string as NSString).length)
-        let spans = fencedCodeSpans(in: textStorage.string as NSString, fullRange: full)
+        let nsString = textStorage.string as NSString
+        let full = NSRange(location: 0, length: nsString.length)
+        let fenceLines = fenceLineRanges(in: nsString, fullRange: full)
+        lastFenceLineStarts = fenceLines.map { $0.location }
+        let spans = spansFromFences(fenceLines, fullRange: full)
         applyHighlighting(to: textStorage, in: full, fencedSpans: spans)
     }
 
@@ -129,8 +145,9 @@ final class MarkdownHighlighter: NSObject, NSTextStorageDelegate {
             }
         }
 
+        let source = ts.string
         for rule in Self.inlineRules {
-            rule.regex.enumerateMatches(in: ts.string, options: [], range: range) { match, _, _ in
+            rule.regex.enumerateMatches(in: source, options: [], range: range) { match, _, _ in
                 guard let m = match else { return }
                 if Self.intersectsAny(m.range, ranges: fencedSpans) { return }
                 rule.apply(ts, m)
@@ -138,11 +155,15 @@ final class MarkdownHighlighter: NSObject, NSTextStorageDelegate {
         }
     }
 
-    private func fencedCodeSpans(in nsString: NSString, fullRange: NSRange) -> [NSRange] {
+    private func fenceLineRanges(in nsString: NSString, fullRange: NSRange) -> [NSRange] {
         var fences: [NSRange] = []
         Self.fencePattern.enumerateMatches(in: nsString as String, options: [], range: fullRange) { match, _, _ in
             if let m = match { fences.append(m.range) }
         }
+        return fences
+    }
+
+    private func spansFromFences(_ fences: [NSRange], fullRange: NSRange) -> [NSRange] {
         var spans: [NSRange] = []
         var i = 0
         while i < fences.count {

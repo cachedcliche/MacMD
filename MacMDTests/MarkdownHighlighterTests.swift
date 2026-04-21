@@ -175,4 +175,42 @@ final class MarkdownHighlighterTests: XCTestCase {
         storage.endEditing()
         XCTAssertTrue(font(at: 0, in: storage)?.fontDescriptor.symbolicTraits.contains(.bold) ?? false)
     }
+
+    func testAddingFenceRehighlightsFollowingContent() {
+        let storage = NSTextStorage(string: "hello world\nmore text\n")
+        let highlighter = MarkdownHighlighter()
+        storage.delegate = highlighter
+        highlighter.rehighlightAll(storage)
+
+        let moreIndexBefore = (storage.string as NSString).range(of: "more").location
+        XCTAssertEqual(color(at: moreIndexBefore, in: storage), Theme.textColor,
+                       "Content should start as plain text before any fence is added")
+
+        storage.beginEditing()
+        storage.replaceCharacters(in: NSRange(location: 0, length: 0), with: "```\n")
+        storage.endEditing()
+
+        let moreIndexAfter = (storage.string as NSString).range(of: "more").location
+        XCTAssertEqual(color(at: moreIndexAfter, in: storage), Theme.mutedColor,
+                       "Content below a newly-added unclosed fence must re-highlight as code")
+    }
+
+    func testRemovingFenceRehighlightsReleasedContent() {
+        let storage = NSTextStorage(string: "```\ncode here\n```\nafter\n")
+        let highlighter = MarkdownHighlighter()
+        storage.delegate = highlighter
+        highlighter.rehighlightAll(storage)
+
+        let codeIndexBefore = (storage.string as NSString).range(of: "code").location
+        XCTAssertEqual(color(at: codeIndexBefore, in: storage), Theme.mutedColor,
+                       "Content inside a fence should start muted")
+
+        storage.beginEditing()
+        storage.replaceCharacters(in: NSRange(location: 0, length: 4), with: "")
+        storage.endEditing()
+
+        let codeIndexAfter = (storage.string as NSString).range(of: "code").location
+        XCTAssertEqual(color(at: codeIndexAfter, in: storage), Theme.textColor,
+                       "Content should return to plain text after its opening fence is deleted")
+    }
 }
