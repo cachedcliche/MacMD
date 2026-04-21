@@ -6,17 +6,49 @@ Built for editing claude.md, skill definitions, agent configs, READMEs, and simi
 
 ![MacMD screenshot](docs/screenshot.png)
 
-## Run it
+## Install
 
-Double-click `MacMD.app`. That's it.
+Minimum macOS version: 14 (Sonoma). Tested on 15 (Sequoia) and 26 (Tahoe).
 
-First launch on a fresh Mac may show a Gatekeeper prompt because the app is ad-hoc signed (not notarized). To bypass it:
+### 1. Download
 
-    right-click MacMD.app → Open → Open
+Grab `MacMD-1.0.0.dmg` from the [latest release](../../releases/latest). It's ~160 KB.
 
-macOS will remember the choice for future launches.
+### 2. Copy to Applications
 
-Minimum macOS version: 14 (Sonoma).
+Double-click the DMG. A Finder window opens with `MacMD.app` and an `Applications` shortcut. Drag `MacMD.app` onto `Applications`. You can eject the DMG after.
+
+### 3. First launch (one-time Gatekeeper approval)
+
+MacMD is signed ad-hoc, not Apple-notarized (notarization requires a paid Apple Developer account), so macOS blocks it the first time.
+
+**On macOS 15 Sequoia or newer:**
+
+1. Double-click `MacMD` in Applications.
+2. macOS shows "cannot verify this app is free from malware." Click **Done**.
+3. Open **System Settings → Privacy & Security**. Scroll to the **Security** section.
+4. Next to "MacMD was blocked to protect your Mac", click **Open Anyway**.
+5. Confirm once more, authenticate with Touch ID or password.
+6. MacMD launches.
+
+**On macOS 14 Sonoma:**
+
+Right-click `MacMD.app` → **Open** → **Open** in the confirmation dialog.
+
+After this one-time approval, MacMD launches normally every time.
+
+### 4. Open .md files
+
+Any of these work:
+
+- Double-click any `.md` file and choose **Open With → MacMD** (or set it as default via File → Get Info → Open with → Change All).
+- Drag a `.md` file onto the MacMD icon in the Dock.
+- File → Open inside MacMD.
+- Cmd-N for a new untitled document.
+
+### Uninstall
+
+Drag `MacMD.app` from Applications to Trash. No daemons, no receipts, no leftover prefs.
 
 ## Write and save
 
