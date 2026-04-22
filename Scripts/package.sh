@@ -25,12 +25,18 @@ xcodebuild \
     clean build
 
 BUILT_APP=$(find "$HOME/Library/Developer/Xcode/DerivedData" \
-    -type d -name "$APP_NAME" -path "*MacMD*/Build/Products/Release/*" 2>/dev/null | head -n 1)
+    -type d -name "$APP_NAME" -path "*MacMD*/Build/Products/Release/*" -print0 2>/dev/null \
+    | xargs -0 stat -f "%m %N" \
+    | sort -rn \
+    | head -n 1 \
+    | cut -d' ' -f2-)
 
-if [[ -z "$BUILT_APP" ]]; then
+if [[ -z "$BUILT_APP" || ! -d "$BUILT_APP" ]]; then
     echo "ERROR: could not locate built $APP_NAME" >&2
     exit 1
 fi
+
+echo "Using build: $BUILT_APP"
 
 mkdir -p "$DIST"
 rm -f "$DIST/$ZIP_NAME" "$DIST/$ZIP_NAME.sha256" \
