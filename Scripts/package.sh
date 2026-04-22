@@ -9,7 +9,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-VERSION="${1:-1.0.0}"
+VERSION="${1:-1.0.1}"
 DIST="dist"
 APP_NAME="MacMD.app"
 ZIP_NAME="MacMD-${VERSION}.zip"

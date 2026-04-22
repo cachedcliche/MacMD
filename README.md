@@ -12,12 +12,12 @@ Minimum macOS version: 14 (Sonoma). Tested on 15 (Sequoia) and 26 (Tahoe).
 
 ### 1. Download
 
-Go to the [latest release](../../releases/latest). You'll see several files — grab just one:
+Go to the [latest release](../../releases/latest). You'll see several files — grab just one (version numbers will match whatever the current release is):
 
 | File | What it is | Who should click it |
 |---|---|---|
-| **`MacMD-1.0.0.dmg`** | The installer. ~160 KB. | **Most people — this is the one you want.** |
-| `MacMD-1.0.0.zip` | Same app, zipped instead of in a DMG. | Alternative if your browser doesn't like DMGs. |
+| **`MacMD-<version>.dmg`** | The installer. ~160 KB. | **Most people — this is the one you want.** |
+| `MacMD-<version>.zip` | Same app, zipped instead of in a DMG. | Alternative if your browser doesn't like DMGs. |
 | `*.sha256` | Tiny checksum files. | Optional; for verifying your download wasn't tampered with. |
 | `Source code (zip / tar.gz)` | The Swift source. | Only if you want to build it yourself. Ignore otherwise. |
 
@@ -124,18 +124,18 @@ Run tests:
 
     xcodebuild test -project MacMD.xcodeproj -scheme MacMD -destination 'platform=macOS'
 
-There are 20 unit tests covering every syntax highlighting rule and the tricky edge cases (bold+italic composition, unclosed code fences, list-marker vs italic disambiguation, paragraph-style preservation).
+The test suite covers every syntax highlighting rule and the tricky edge cases (bold+italic composition, unclosed and newly-added/removed code fences, list-marker vs italic disambiguation, paragraph-style preservation).
 
 ### Produce a release bundle
 
-    Scripts/package.sh 1.0.0
+    Scripts/package.sh X.Y.Z
 
 This runs a clean Release build and produces four artifacts in `dist/`:
 
-    MacMD-1.0.0.zip           signature-preserving zip (built with ditto)
-    MacMD-1.0.0.zip.sha256
-    MacMD-1.0.0.dmg           drag-to-Applications installer
-    MacMD-1.0.0.dmg.sha256
+    MacMD-X.Y.Z.zip           signature-preserving zip (built with ditto)
+    MacMD-X.Y.Z.zip.sha256
+    MacMD-X.Y.Z.dmg           drag-to-Applications installer
+    MacMD-X.Y.Z.dmg.sha256
 
 Upload all four to the GitHub release page. Most users prefer the DMG; the zip is a smaller alternative.
 
