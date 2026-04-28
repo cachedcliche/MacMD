@@ -102,11 +102,11 @@ If you try to open a file that isn't valid UTF-8, MacMD refuses and surfaces a c
 
 ## Security
 
-MacMD is sandboxed. It has access only to:
+MacMD has no network access, no access to the camera, microphone, location, photos, contacts, calendars, or Spotlight indexing. It doesn't register any URL schemes, daemons, or background services. The hardened runtime is enabled and the binary is code-signed.
 
-    Files you explicitly open or save to (user-selected read/write).
+The app only ever opens and saves files you explicitly choose through the standard Open and Save panels — it doesn't browse your filesystem on its own.
 
-It has no network access, no access to the camera, microphone, location, photos, contacts, calendars, or Spotlight indexing. It doesn't register any URL schemes or services. The hardened runtime is enabled.
+As of 1.0.2 MacMD is **not sandboxed**. The App Sandbox was removed because it caused intermittent save failures on external / USB volumes (the security-scoped URL granted at file-open time stopped being valid after the drive slept or was re-mounted, which is a known limitation of SwiftUI's `DocumentGroup`). This matches the posture of editors like BBEdit, Sublime Text, and VS Code.
 
 You can verify at any time:
 
@@ -155,13 +155,14 @@ Upload all four to the GitHub release page. Most users prefer the DMG; the zip i
         MarkdownHighlighter.swift NSTextStorageDelegate; regex rules
         Theme.swift               Fonts, colors, paragraph style
         Info.plist                Document types, UTI declarations
-        MacMD.entitlements        Sandbox; user-selected files R/W
+        MacMD.entitlements        Empty (sandbox removed in 1.0.2)
         Assets.xcassets/          AppIcon + AccentColor
       MacMDTests/
         MarkdownHighlighterTests.swift
       Scripts/
         README.md
         make_icon.swift           Regenerates the app icon PNGs
+        make_social_preview.swift Regenerates the GitHub social preview card
         package.sh                Builds Release and produces zip + dmg in dist/
       docs/
         screenshot.png
